@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobRadar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:20px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
+.logo h1{font-size:22px;font-weight:700}
+.logo p{font-size:12px;color:#94a3b8}
+.scan-btn{padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.scan-btn:hover{background:#4f46e5}
+.scan-btn:disabled{opacity:0.5;cursor:not-allowed}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.scanning{animation:pulse 1.5s infinite}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:20px}
+.stat-card{padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;transition:all 0.15s}
+.stat-card:hover{border-color:#6366f1}
+.stat-card.active{border-color:var(--accent);background:var(--accent-bg)}
+.stat-label{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.badge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800}
+.stat-name{font-size:12px;font-weight:600}
+.stat-count{font-size:20px;font-weight:700}
+.stat-suffix{font-size:11px;color:#94a3b8;margin-left:4px}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filters input,.filters select{padding:9px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.filters input:focus,.filters select:focus{border-color:#6366f1}
+.filters input[type=text]{flex:1;min-width:200px}
+.score-filter{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b}
+.score-filter input[type=range]{width:80px}
+.results-info{font-size:12px;color:#94a3b8;margin-bottom:10px}
+.results-info span{color:#6366f1;font-weight:600}
+.job-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.15s}
+.job-card:hover{border-color:#6366f1;box-shadow:0 2px 12px rgba(99,102,241,0.06)}
+.job-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.job-main{flex:1}
+.job-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.platform-chip{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.platform-chip.linkedin{background:#0A66C210;color:#0A66C2}
+.platform-chip.dice{background:#EB1C2610;color:#EB1C26}
+.job-time{font-size:11px;color:#94a3b8}
+.job-title{font-size:15px;font-weight:600;margin:4px 0}
+.job-company{font-size:13px;color:#64748b}
+.job-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{padding:2px 8px;border-radius:4px;background:#f1f5f9;font-size:11px;color:#475569}
+.match-box{text-align:right;flex-shrink:0;min-width:110px}
+.resume-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}
+.match-score{font-size:22px;font-weight:700;margin-top:4px}
+.match-label{font-size:10px;color:#94a3b8}
+.job-details{margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;display:none}
+.job-card.expanded .job-details{display:block}
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;font-size:13px}
+.details-grid .dlabel{color:#64748b}
+.apply-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#6366f1;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.15s}
+.apply-btn:hover{background:#4f46e5}
+.empty{text-align:center;padding:48px;color:#94a3b8;font-size:14px;background:#fff;border:1px solid #e2e8f0;border-radius:12px}
+.status-bar{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#64748b}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;margin-right:6px}
+.footer{text-align:center;font-size:11px;color:#cbd5e1;padding:20px 0}
+@media(prefers-color-scheme:dark){
+body{background:#0f172a;color:#e2e8f0}
+.job-card,.stat-card,.status-bar,.empty{background:#1e293b;border-color:#334155}
+.job-card:hover,.stat-card:hover{border-color:#818cf8}
+.filters input,.filters select{background:#1e293b;border-color:#334155;color:#e2e8f0}
+.tag{background:#334155;color:#94a3b8}
+.job-details{border-color:#334155}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo"><div class="logo-icon">JR</div><div><h1>JobRadar</h1><p id="subtitle">Loading...</p></div></div>
+<button class="scan-btn" id="scanBtn" onclick="runScan()">Scan Now</button>
+</div>
+<div class="status-bar"><span><span class="status-dot"></span>Last scan: <span id="lastScan">--</span></span><span>Auto-refreshes every 5 min</span></div>
+<div class="stats-grid" id="statsGrid"></div>
+<div class="filters">
+<input type="text" id="searchInput" placeholder="Search jobs, skills, companies..." oninput="filterJobs()">
+<select id="platformFilter" onchange="filterJobs()"><option value="">All platforms</option><option value="linkedin">LinkedIn</option><option value="dice">Dice</option></select>
+<select id="sortBy" onchange="filterJobs()"><option value="score">Sort: Match Score</option><option value="recent">Sort: Most Recent</option><option value="title">Sort: Title</option></select>
+<div class="score-filter"><span>Min score:</span><input type="range" id="scoreSlider" min="0" max="100" step="10" value="0" oninput="document.getElementById('scoreVal').textContent=this.value;filterJobs()"><span id="scoreVal" style="font-weight:600;min-width:20px">0</span></div>
+</div>
+<p class="results-info" id="resultsInfo"></p>
+<div id="jobsList"></div>
+<div class="footer">JobRadar - Nikhil Raj Yammani - Auto-matched to 6 resume variants</div>
+</div>
+<script>
+const RC={"General DE":{color:"#6366f1",icon:"G"},"Azure DE":{color:"#0EA5E9",icon:"Az"},"GCP DE":{color:"#F59E0B",icon:"GC"},"Snowflake DE":{color:"#06B6D4",icon:"SF"},"Big Data DE":{color:"#EF4444",icon:"BD"},"Data Modeling":{color:"#8B5CF6",icon:"DM"}};
+let allJobs=[],activeResume="";
+async function loadJobs(){try{const r=await fetch("/api/jobs");const d=await r.json();allJobs=d.jobs||[];renderJobs(allJobs);loadStats()}catch(e){document.getElementById("jobsList").innerHTML='<div class="empty">Click Scan Now to fetch jobs</div>'}}
+async function loadStats(){try{const r=await fetch("/api/stats");const s=await r.json();document.getElementById("subtitle").textContent=s.total+" jobs - Resume-matched - Contract/C2C";if(s.last_scrape){document.getElementById("lastScan").textContent=new Date(s.last_scrape).toLocaleString()}renderStats(s.resume_counts||{})}catch(e){}}
+function renderStats(counts){const g=document.getElementById("statsGrid");g.innerHTML="";Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([name,count])=>{const info=RC[name]||{color:"#6b7280",icon:"?"};const isA=activeResume===name;const c=document.createElement("div");c.className="stat-card"+(isA?" active":"");c.style.setProperty("--accent",info.color);c.style.setProperty("--accent-bg",info.color+"10");c.onclick=()=>{activeResume=activeResume===name?"":name;filterJobs();loadStats()};c.innerHTML='<div class="stat-label"><span class="badge" style="background:'+info.color+'">'+info.icon+'</span><span class="stat-name">'+name+'</span></div><span class="stat-count">'+count+'</span><span class="stat-suffix">jobs</span>';g.appendChild(c)})}
+function sc(s){return s>=70?"#10b981":s>=40?"#f59e0b":"#94a3b8"}
+function renderJobs(jobs){const l=document.getElementById("jobsList");if(!jobs.length){l.innerHTML='<div class="empty">No jobs found. Click Scan Now to fetch jobs.</div>';document.getElementById("resultsInfo").innerHTML="";return}document.getElementById("resultsInfo").innerHTML="Showing <span>"+jobs.length+"</span> of "+allJobs.length+" jobs";l.innerHTML=jobs.map((j,i)=>{const info=RC[j.best_resume]||{color:"#6b7280",icon:"?"};const tags=Array.isArray(j.tags)?j.tags:[];return '<div class="job-card" id="card-'+i+'" onclick="toggleCard('+i+')"><div class="job-top"><div class="job-main"><div class="job-meta"><span class="platform-chip '+j.platform+'">'+j.platform+'</span><span class="job-time">'+(j.description||"")+'</span></div><div class="job-title">'+j.title+'</div><div class="job-company">'+(j.company!=="See posting"?j.company:"")+(j.location&&j.location!=="See posting"?" - "+j.location:"")+'</div>'+(tags.length?'<div class="job-tags">'+tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>':"")+'</div><div class="match-box"><div class="resume-pill" style="background:'+info.color+'12;border:1px solid '+info.color+'30;color:'+info.color+'"><span class="badge" style="background:'+info.color+';width:16px;height:16px;border-radius:4px;font-size:8px">'+info.icon+'</span>'+j.best_resume+'</div><div class="match-score" style="color:'+sc(j.match_score||0)+'">'+(j.match_score||0)+'%</div><div class="match-label">match score</div></div></div><div class="job-details"><div class="details-grid"><div><span class="dlabel">Best resume: </span><strong>'+j.best_resume+'</strong><br><small style="color:#94a3b8">'+(j.resume_file||"")+'</small></div><div><span class="dlabel">Alternative: </span><strong>'+(j.alt_resume||"--")+'</strong></div></div><a href="'+j.url+'" target="_blank" class="apply-btn" onclick="event.stopPropagation()">Apply Now</a></div></div>'}).join("")}
+function toggleCard(i){document.getElementById("card-"+i).classList.toggle("expanded")}
+function filterJobs(){const s=document.getElementById("searchInput").value.toLowerCase();const p=document.getElementById("platformFilter").value;const ms=parseInt(document.getElementById("scoreSlider").value);const sb=document.getElementById("sortBy").value;let f=allJobs.filter(j=>{if(s&&!(j.title+" "+j.company+" "+(j.tags||[]).join(" ")).toLowerCase().includes(s))return false;if(p&&j.platform!==p)return false;if(activeResume&&j.best_resume!==activeResume)return false;if((j.match_score||0)<ms)return false;return true});f.sort((a,b)=>{if(sb==="score")return(b.match_score||0)-(a.match_score||0);if(sb==="recent")return(b.scraped_at||"").localeCompare(a.scraped_at||"");if(sb==="title")return(a.title||"").localeCompare(b.title||"");return 0});renderJobs(f)}
+async function runScan(){const b=document.getElementById("scanBtn");b.disabled=true;b.textContent="Scanning...";b.classList.add("scanning");try{const r=await fetch("/api/scrape",{method:"POST"});const d=await r.json();b.textContent="Found "+d.new+" new!";setTimeout(()=>{b.textContent="Scan Now";b.disabled=false;b.classList.remove("scanning")},3000);loadJobs()}catch(e){b.textContent="Error";setTimeout(()=>{b.textContent="Scan Now";b.disabled=false;b.classList.remove("scanning")},3000)}}
+setInterval(loadJobs,300000);
+loadJobs();
+</script>
+</body>
+</html>
