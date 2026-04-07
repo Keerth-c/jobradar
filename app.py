@@ -94,11 +94,15 @@ def scrape_linkedin(session):
     platform = "linkedin"
     all_jobs = []
     for term in ["data engineer contract", "ETL data engineer", "data pipeline engineer", "analytics engineer contract"]:
-        url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={quote_plus(term)}&f_TPR=r86400&f_JT=C&sortBy=DD&start=0"
-        try:
-            resp = session.get(url, timeout=15)
-            soup = BeautifulSoup(resp.text, "html.parser")
-            for card in soup.find_all("li"):
+        for start in range(0, 100, 10):
+            url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={quote_plus(term)}&f_TPR=r86400&f_JT=C&sortBy=DD&start={start}"
+            try:
+                resp = session.get(url, timeout=15)
+                soup = BeautifulSoup(resp.text, "html.parser")
+                cards = [c for c in soup.find_all("li") if c.select_one("h3")]
+                if not cards:
+                    break
+                for card in cards:
                 t = card.select_one("h3")
                 c = card.select_one("h4")
                 l = card.select_one("span.job-search-card__location")
@@ -118,8 +122,8 @@ def scrape_linkedin(session):
                     "posted_date": datetime.now().strftime("%Y-%m-%d"),
                     "best_resume": match["best_resume"], "resume_file": match["best_file"],
                     "match_score": match["match_score"], "alt_resume": match["alt_resume"]})
-        except: pass
-        time.sleep(1)
+            except: pass
+            time.sleep(1)
     seen = set()
     return [j for j in all_jobs if j["id"] not in seen and not seen.add(j["id"])]
 
